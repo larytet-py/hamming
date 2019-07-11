@@ -54,7 +54,7 @@ def bit_count(n):
     return count
 
 def update_dict(d, c1, c2, distance):
-  if not c1 in d.keys:
+  if not c1 in d.keys():
     d[c1] = []
   d[c1].append((c2, distance))
 
@@ -71,7 +71,7 @@ def hamming(data_set, max_distance):
   combinations = nCr(len(data_set), 2)
   logger.info("Brute force {0} pairs for distances below {1}".format(combinations, max_distance+1))
   d = {}
-  count = 0
+  count = 0.0
   start_time = time.time()
   for c in itertools.combinations(data_set, 2):
     xor_result = c[0] ^ c[1]
@@ -80,11 +80,12 @@ def hamming(data_set, max_distance):
       update_dict(d, c[0], c[1], bc)
       logger.info("Found {0},{1} distance={2}".format(c[0], c[1], bc))
     count += 1
-    if count & 0x7FFF == 0:
+    if int(count) & 0x7FFF == 0:
       elapsed_time = time.time()- start_time
       rate = count/elapsed_time
       expected_completion = (combinations-count)/rate
-      logger.debug("Completed {0} from {1} at rate {2} completion in {3:.2f} hours".format(count, combinations, rate, expected_completion/3600))
+      completed = 100*count/combinations
+      logger.debug("Completed {0} from {1} {2:.4f}% at rate {3} completion in {4:.2f} hours".format(count, combinations, completed, rate, expected_completion/3600))
 
   return d
 
@@ -128,7 +129,7 @@ if __name__ == '__main__':
         data_set = read_data_set(f)
         data_set_size = len(data_set)
         if data_set_size == 0:
-          logger.debug("No data in the input file")
+          logger.debug("No data in the input file {0}".format(data_file))
           break
         else:
           logger.debug("Read {0} hashes. First hash {1}".format(len(data_set), hex(data_set[0])))
