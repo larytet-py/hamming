@@ -80,8 +80,10 @@ def hamming(data_set, max_distance):
       logger.info("Found {0},{1} distance={2}".format(c[0], c[1], bc))
     count += 1
     if count & 0x7FFF == 0:
-      rate = count/(time.time()- start_time)
-      logger.debug("Completed {0} from {1} at rate {2}".format(count, combinations, rate))
+      elapsed_time = time.time()- start_time
+      rate = count/elapsed_time
+      expected_completion = (combinations-count)/rate
+      logger.debug("Completed {0} from {1} at rate {2} completion in {3} seconds".format(count, combinations, rate, expected_completion))
 
   return d
 
