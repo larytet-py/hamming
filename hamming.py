@@ -24,6 +24,7 @@ import sys
 import os
 import re
 from docopt import docopt
+import itertools
 
 def open_file(filename, flags, print_error=True):
     '''
@@ -39,11 +40,36 @@ def open_file(filename, flags, print_error=True):
     else:
       return (True, file_handle) 
 
+
+def bit_count(n):
+    count = 0
+    while n > 0:
+        if (n & 1 == 1): count += 1
+        n >>= 1
+
+    return count
+
+def update_dict(d, c1, c2, distance):
+  if not c1 in d.keys:
+    d[c1] = []
+  if not c2 in d.keys:
+    d[c2] = []
+
+  d[c1].append((c2, distance))
+  d[c2].append((c1, distance))
+
 def hamming(data_set, max_distance):
   '''
   Create dictionary of hashes with hamming distance less than max_distance
   '''
-  pass
+  d = {}
+  for c in itertools.combinations(data_set, 2):
+    xor_result = c[0] ^ c[1]
+    bc = bit_count(xor_result)
+    if bc <= max_distance:
+      update_dict(d, c[0], c[1], bc)
+
+  return d
 
 
 
@@ -73,7 +99,7 @@ if __name__ == '__main__':
           logger.info("Nothing to do")
           break
 
-        max_distance = 32
+        max_distance = 3
         if not distance_arg is None:
           max_distance = int(distance_arg)
 
@@ -90,5 +116,11 @@ if __name__ == '__main__':
         else:
           logger.debug("Read {0} hashes. First hash {1}".format(len(data_set), hex(data_set[0])))
 
-        hamming_distances = hamming(f, max_distance)
+        hamming_distances = hamming(data_set, max_distance)
+        hamming_distances_size = len(hamming_distances)
+        if hamming_distances_size == 0:
+          logger.debug("No pairs found for maximum distance {0}".format(max_distance))
+          break
+
+        logger.info("Found {0} pairs:\n{1}".format(hamming_distances_size, hamming_distances))
         break
