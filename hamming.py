@@ -97,7 +97,12 @@ def read_data_set(f):
   '''
   data = []
   for l in f:
-    data.append(int(l, 16))
+    l = "0x"+l.strip().lower()
+    value = int(l, 16)
+    value_str = hex(value)
+    if l+"L" != value_str:
+      logger.error("Bad conversion {0} {1}".format(l, value_str))
+    data.append(value)
 
   return data
 
@@ -105,7 +110,7 @@ if __name__ == '__main__':
     arguments = docopt(__doc__, version='0.1')
     logging.basicConfig()    
     logger = logging.getLogger('hamming')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
 
     data_file = arguments['--file']
