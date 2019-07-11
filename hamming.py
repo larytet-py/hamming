@@ -19,6 +19,9 @@ Options:
 '''
 
 
+import operator 
+import functools 
+import time
 import logging
 import sys
 import os
@@ -47,7 +50,6 @@ def bit_count(n):
     while n > 0:
         if (n & 1 == 1): count += 1
         n >>= 1
-
     return count
 
 def update_dict(d, c1, c2, distance):
@@ -55,22 +57,21 @@ def update_dict(d, c1, c2, distance):
     d[c1] = []
   d[c1].append((c2, distance))
 
-import operator as op
-from functools import reduce
-
 def nCr(n,r):
     r = min(r, n-r)
-    numer = reduce(op.mul, range(n, n-r, -1), 1)
-    denom = reduce(op.mul, range(1, r+1), 1)
+    numer = functools.reduce(operator.mul, range(n, n-r, -1), 1)
+    denom = functools.reduce(operator.mul, range(1, r+1), 1)
     return numer / denom
-    
+
 def hamming(data_set, max_distance):
   '''
   Create dictionary of hashes with hamming distance less than max_distance
   '''
-  logger.info("Brute force {0} pairs".format(nCr(len(data_set), 2)))
+  combinations = nCr(len(data_set), 2)
+  logger.info("Brute force {0} pairs".format(combinations))
   d = {}
   count = 0
+  start_time = time.time()
   for c in itertools.combinations(data_set, 2):
     xor_result = c[0] ^ c[1]
     bc = bit_count(xor_result)
@@ -79,7 +80,8 @@ def hamming(data_set, max_distance):
       logger.info("Found {0},{1} distance={2}".format(c[0], c[1], bc))
     count += 1
     if count & 0x7FFF == 0:
-      logger.debug(count)
+      rate = count/(time.time()- start_time)
+      logger.debug("Completed {0} from {1} at rate {2}".format(count, combinations, rate))
 
   return d
 
