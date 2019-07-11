@@ -10,7 +10,7 @@ Usage:
   hamming.py -h | --help
   hamming.py -f <FILENAME> [-d <MAXDISTANCE>] 
 Example:
-    dockerfile_generator.py -c containers.yml
+    hamming.py -f hashes.txt
    
 Options:
   -h --help                 Show this screen.
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     arguments = docopt(__doc__, version='0.1')
     logging.basicConfig()    
     logger = logging.getLogger('hamming')
-    logger.setLevel(logging.INFO) 
+    logger.setLevel(logging.DEBUG)
 
 
     data_file = arguments['--file']
@@ -83,7 +83,12 @@ if __name__ == '__main__':
           break        
         
         data_set = read_data_set(f)
-        logger.debug("Read {0} hashes".format(len(data_set)))
+        data_set_size = len(data_set)
+        if data_set_size == 0:
+          logger.debug("No data in the input file")
+          break
+        else:
+          logger.debug("Read {0} hashes. First hash {1}".format(len(data_set), hex(data_set[0])))
+
         hamming_distances = hamming(f, max_distance)
         break
-
