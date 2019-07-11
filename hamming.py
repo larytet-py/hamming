@@ -83,7 +83,7 @@ def hamming(data_set, max_distance):
       elapsed_time = time.time()- start_time
       rate = count/elapsed_time
       expected_completion = (combinations-count)/rate
-      logger.debug("Completed {0} from {1} at rate {2} completion in {3} seconds".format(count, combinations, rate, expected_completion))
+      logger.debug("Completed {0} from {1} at rate {2} completion in {3:.2f} hours".format(count, combinations, rate, expected_completion/3600))
 
   return d
 
