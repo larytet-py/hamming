@@ -78,7 +78,7 @@ def hamming(data_set, max_distance):
     bc = bit_count(xor_result)
     if bc <= max_distance:
       update_dict(d, c[0], c[1], bc)
-      logger.info("Found {0},{1} distance={2}".format(hex(c[0]), hex(c[1]), bc))
+      logger.info("Found {0},{1} distance={2}".format(hex(c[0]).upper(), hex(c[1]).upper(), bc))
     count += 1
     if int(count) & 0x7FFF == 0:
       elapsed_time = time.time()- start_time
