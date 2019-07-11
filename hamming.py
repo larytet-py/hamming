@@ -11,6 +11,7 @@ Usage:
   hamming.py -f <FILENAME> [-d <MAXDISTANCE>] 
 Example:
     hamming.py -f hashes.txt
+    hamming.py -f hashes.txt -d 32
    
 Options:
   -h --help                 Show this screen.
@@ -68,7 +69,7 @@ def hamming(data_set, max_distance):
   Create dictionary of hashes with hamming distance less than max_distance
   '''
   combinations = nCr(len(data_set), 2)
-  logger.info("Brute force {0} pairs".format(combinations))
+  logger.info("Brute force {0} pairs for distances below {1}".format(combinations, max_distance+1))
   d = {}
   count = 0
   start_time = time.time()
