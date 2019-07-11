@@ -25,6 +25,7 @@ import os
 import re
 from docopt import docopt
 import itertools
+import math
 
 def open_file(filename, flags, print_error=True):
     '''
@@ -52,22 +53,33 @@ def bit_count(n):
 def update_dict(d, c1, c2, distance):
   if not c1 in d.keys:
     d[c1] = []
-  if not c2 in d.keys:
-    d[c2] = []
-
   d[c1].append((c2, distance))
-  d[c2].append((c1, distance))
 
+import operator as op
+from functools import reduce
+
+def nCr(n,r):
+    r = min(r, n-r)
+    numer = reduce(op.mul, range(n, n-r, -1), 1)
+    denom = reduce(op.mul, range(1, r+1), 1)
+    return numer / denom
+    
 def hamming(data_set, max_distance):
   '''
   Create dictionary of hashes with hamming distance less than max_distance
   '''
+  logger.info("Brute force {0} pairs".format(nCr(len(data_set), 2)))
   d = {}
+  count = 0
   for c in itertools.combinations(data_set, 2):
     xor_result = c[0] ^ c[1]
     bc = bit_count(xor_result)
     if bc <= max_distance:
       update_dict(d, c[0], c[1], bc)
+      logger.info("Found {0},{1} distance={2}".format(c[0], c[1], bc))
+    count += 1
+    if count & 0x7FFF == 0:
+      logger.debug(count)
 
   return d
 
