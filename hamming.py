@@ -170,17 +170,16 @@ if __name__ == '__main__':
         else:
           logger.debug("Read {0} hashes. First hash {1}".format(len(data_set), hex(data_set[0])))
 
-        cpus = 1 # multiprocessing.cpu_count()
+        cpus = multiprocessing.cpu_count()
+        started_jobs = []
         for cpu in range(cpus):          
           data_cpu_set_size = data_set_size/cpus
           start = data_cpu_set_size * cpu
           stop = data_cpu_set_size * (cpu+1)
           cpu_set = data_set[start:stop]
-          hamming_siblings, hamming_distances = hamming(cpu_set, max_distance)
-        hamming_distances_size = len(hamming_siblings)
-        if hamming_distances_size == 0:
-          logger.debug("No pairs found for maximum distance {0}".format(max_distance))
-          break
-
-        logger.info("Found {0} pairs:\n{1}".format(hamming_distances_size, hamming_distances))
+          job = multiprocessing.Process(target=hamming, args=(cpu_set, max_distance, ))
+          started_jobs.append(job)
+          job.start()
+          for job in started_jobs:
+            job.join()
         break
