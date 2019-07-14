@@ -21,6 +21,7 @@ Options:
 
 
 import operator 
+import multiprocessing
 import random
 import functools 
 import time
@@ -81,12 +82,14 @@ def plot_distances(distances, total, step = 5):
       plot_list.append(0)
     plot_list[distance_normalize] += distances[distance]
 
-  i = 0
   #logger.info("Plotting {0} {1}".format(plot_list, distances))
+  i = 0
+  s = ""
   while i < len(plot_list):
     count = plot_list[i]
-    logger.info("{0} {1} {2:.4f}".format(i*5, count, (1.0*count)/total*100))
+    s = s + ("{0} {1} {2:.4f}\n".format(i*5, count, (1.0*count)/total*100))
     i += 1
+  logger.info(s)
        
 
 def hamming(data_set, max_distance):
@@ -167,8 +170,14 @@ if __name__ == '__main__':
         else:
           logger.debug("Read {0} hashes. First hash {1}".format(len(data_set), hex(data_set[0])))
 
-        hamming_siblings, hamming_distances = hamming(data_set, max_distance)
-        hamming_distances_size = len(hamming_distances)
+        cpus = multiprocessing.cpu_count()
+        for cpu in range(cpus):          
+          data_cpu_set_size = data_set_size/cpus
+          start = int(data_cpu_set_size * cpu)
+          stop = int(data_cpu_set_size * (cpu+1))
+          cpu_set = data_set[start:stop]
+          hamming_siblings, hamming_distances = hamming(cpu_set, max_distance)
+        hamming_distances_size = len(hamming_siblings)
         if hamming_distances_size == 0:
           logger.debug("No pairs found for maximum distance {0}".format(max_distance))
           break
