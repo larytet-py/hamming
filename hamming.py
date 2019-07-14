@@ -111,10 +111,10 @@ def hamming(data_set, max_distance):
       rate = (1.0*count)/elapsed_time
       expected_completion = (combinations-1.0*count)/rate
       completed = 100.0*count/combinations
-      logger.info("Completed {0} from {1} {2:.4f}% at rate {3} completion in {4:.2f} hours. Found {5} pairs".format(
-        count, combinations, completed, rate, expected_completion/3600, len(d)))
+      logger.info("Completed {0} from {1} {2:.4f}% at rate {3} completion in {4:.2f} hours".format(
+        count, combinations, completed, rate, expected_completion/3600))
       plot_distances(distances, count)
-  return d
+  return d, distances
 
 
 
@@ -167,7 +167,7 @@ if __name__ == '__main__':
         else:
           logger.debug("Read {0} hashes. First hash {1}".format(len(data_set), hex(data_set[0])))
 
-        hamming_distances = hamming(data_set, max_distance)
+        hamming_siblings, hamming_distances = hamming(data_set, max_distance)
         hamming_distances_size = len(hamming_distances)
         if hamming_distances_size == 0:
           logger.debug("No pairs found for maximum distance {0}".format(max_distance))
