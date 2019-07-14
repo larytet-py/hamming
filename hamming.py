@@ -47,10 +47,12 @@ def open_file(filename, flags, print_error=True):
       return (True, file_handle) 
 
 
-def bit_count(n):
+def bit_count(n, max):
     count = 0
     while n > 0:
         if (n & 1 == 1): count += 1
+        if count > max:
+          break
         n >>= 1
     return count
 
@@ -58,6 +60,7 @@ def update_dict(distances, hashes, c1, c2, distance):
   if not c1 in hashes.keys():
     hashes[c1] = []
   hashes[c1].append((c2, distance))
+
   if not distance in distances.keys():
     distances[distance] = 1
   else:
@@ -72,15 +75,15 @@ def nCr(n,r):
 def plot_distances(distances, total, step = 5):
   plot_list = []
   for distance, count in distances.items():
-    distance = distance/step
-    while len(plot_list) <= distance:
+    distance_normalize = distance/step
+    while len(plot_list) <= distance_normalize:
       plot_list.append(0)
-    plot_list[distance] += count
+    plot_list[distance_normalize] += count
 
   i = 0
-  logger.debug("Plotting {0}".format(plot_list))
+  #logger.info("Plotting {0} {1}".format(plot_list, distances))
   while i < len(plot_list):
-    logger.info("{0} {1:.4f}".format(i*5, count/total))
+    logger.info("{0} {1} {2:.4f}".format(i*5, count, count/total))
     i += 1
        
 
@@ -95,20 +98,19 @@ def hamming(data_set, max_distance):
   start_time = time.time()
   distances = {}
   for c in itertools.combinations(data_set, 2):
+    count += 1
     xor_result = c[0] ^ c[1]
-    bc = bit_count(xor_result)
+    bc = bit_count(xor_result, max_distance+1)
     if bc <= max_distance:
       update_dict(distances, d, c[0], c[1], bc)
-      logger.info("Found {0},{1} distance={2}".format(hex(c[0]).upper(), hex(c[1]).upper(), bc))
-    count += 1
+      logger.debug("Found {0},{1} distance={2}".format(hex(c[0]).upper(), hex(c[1]).upper(), bc))
     if count & 0x7FFF == 0:
       elapsed_time = time.time()- start_time
       rate = (1.0*count)/elapsed_time
       expected_completion = (combinations-1.0*count)/rate
       completed = 100.0*count/combinations
-      logger.debug("Completed {0} from {1} {2:.4f}% at rate {3} completion in {4:.2f} hours. Found {5} pairs".format(
+      logger.info("Completed {0} from {1} {2:.4f}% at rate {3} completion in {4:.2f} hours. Found {5} pairs".format(
         count, combinations, completed, rate, expected_completion/3600, len(d)))
-      logger.debug("{0}".format(distances))
       plot_distances(distances, count)
   return d
 
@@ -133,7 +135,7 @@ if __name__ == '__main__':
     arguments = docopt(__doc__, version='0.1')
     logging.basicConfig()    
     logger = logging.getLogger('hamming')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
 
     data_file = arguments['--file']
