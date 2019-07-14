@@ -170,11 +170,11 @@ if __name__ == '__main__':
         else:
           logger.debug("Read {0} hashes. First hash {1}".format(len(data_set), hex(data_set[0])))
 
-        cpus = multiprocessing.cpu_count()
+        cpus = 1 # multiprocessing.cpu_count()
         for cpu in range(cpus):          
           data_cpu_set_size = data_set_size/cpus
-          start = int(data_cpu_set_size * cpu)
-          stop = int(data_cpu_set_size * (cpu+1))
+          start = data_cpu_set_size * cpu
+          stop = data_cpu_set_size * (cpu+1)
           cpu_set = data_set[start:stop]
           hamming_siblings, hamming_distances = hamming(cpu_set, max_distance)
         hamming_distances_size = len(hamming_siblings)
