@@ -84,7 +84,7 @@ def plot_distances(distances, total, step = 5):
 
   #logger.info("Plotting {0} {1}".format(plot_list, distances))
   i = 0
-  s = "\n"
+  s = "\nHamming distance/Count/% of total\n"
   while i < len(plot_list):
     count = plot_list[i]
     s = s + ("{0:4}-{1} {2} {3:2.4f}\n".format(i*5, (i+1)*5-1, count, (1.0*count)/total*100))
