@@ -21,6 +21,7 @@ Options:
 
 
 import operator 
+import random
 import functools 
 import time
 import logging
@@ -53,16 +54,30 @@ def bit_count(n):
         n >>= 1
     return count
 
-def update_dict(d, c1, c2, distance):
-  if not c1 in d.keys():
-    d[c1] = []
-  d[c1].append((c2, distance))
+def update_dict(distances, hashes, c1, c2, distance):
+  if not c1 in hashes.keys():
+    hashes[c1] = []
+  hashes[c1].append((c2, distance))
+  if not distance in distances.keys():
+    distances[distance] = 1
+  else:
+    distances[distance] = distances[distance] + 1
 
 def nCr(n,r):
     r = min(r, n-r)
     numer = functools.reduce(operator.mul, range(n, n-r, -1), 1)
     denom = functools.reduce(operator.mul, range(1, r+1), 1)
     return numer / denom
+
+def plot_distances(distances, total, step = 5):
+  plot_list = []
+  for distance, count in distances.items():
+    distance = distance/step
+    while len(plot_list) <= distance:
+      plot_list.append(0)
+    plot_list[distance] += count
+    logger.info("Plot {0}".format(plot_list))
+       
 
 def hamming(data_set, max_distance):
   '''
@@ -73,11 +88,12 @@ def hamming(data_set, max_distance):
   d = {}
   count = 0.0
   start_time = time.time()
+  distances = {}
   for c in itertools.combinations(data_set, 2):
     xor_result = c[0] ^ c[1]
     bc = bit_count(xor_result)
     if bc <= max_distance:
-      update_dict(d, c[0], c[1], bc)
+      update_dict(distances, d, c[0], c[1], bc)
       logger.info("Found {0},{1} distance={2}".format(hex(c[0]).upper(), hex(c[1]).upper(), bc))
     count += 1
     if int(count) & 0x7FFF == 0:
@@ -85,8 +101,9 @@ def hamming(data_set, max_distance):
       rate = count/elapsed_time
       expected_completion = (combinations-count)/rate
       completed = 100*count/combinations
-      logger.debug("Completed {0} from {1} {2:.4f}% at rate {3} completion in {4:.2f} hours".format(count, combinations, completed, rate, expected_completion/3600))
-
+      logger.debug("Completed {0} from {1} {2:.4f}% at rate {3} completion in {4:.2f} hours. Found {5} pairs".format(
+        count, combinations, completed, rate, expected_completion/3600, len(d)))
+      plot_distances(distances, count)
   return d
 
 
@@ -110,7 +127,7 @@ if __name__ == '__main__':
     arguments = docopt(__doc__, version='0.1')
     logging.basicConfig()    
     logger = logging.getLogger('hamming')
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
 
 
     data_file = arguments['--file']
@@ -132,6 +149,7 @@ if __name__ == '__main__':
           break        
         
         data_set = read_data_set(f)
+        random.shuffle(data_set)
         data_set_size = len(data_set)
         if data_set_size == 0:
           logger.debug("No data in the input file {0}".format(data_file))
