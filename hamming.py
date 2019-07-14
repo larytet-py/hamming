@@ -76,7 +76,12 @@ def plot_distances(distances, total, step = 5):
     while len(plot_list) <= distance:
       plot_list.append(0)
     plot_list[distance] += count
-    logger.info("Plot {0}".format(plot_list))
+
+  i = 0
+  logger.debug("Plotting {0}".format(plot_list))
+  while i < len(plot_list):
+    logger.info("{0} {1:.4f}".format(i*5, count/total))
+    i += 1
        
 
 def hamming(data_set, max_distance):
@@ -86,7 +91,7 @@ def hamming(data_set, max_distance):
   combinations = nCr(len(data_set), 2)
   logger.info("Brute force {0} pairs for distances below {1}".format(combinations, max_distance+1))
   d = {}
-  count = 0.0
+  count = 0
   start_time = time.time()
   distances = {}
   for c in itertools.combinations(data_set, 2):
@@ -96,11 +101,11 @@ def hamming(data_set, max_distance):
       update_dict(distances, d, c[0], c[1], bc)
       logger.info("Found {0},{1} distance={2}".format(hex(c[0]).upper(), hex(c[1]).upper(), bc))
     count += 1
-    if int(count) & 0x7FFF == 0:
+    if count & 0x7FFF == 0:
       elapsed_time = time.time()- start_time
-      rate = count/elapsed_time
-      expected_completion = (combinations-count)/rate
-      completed = 100*count/combinations
+      rate = (1.0*count)/elapsed_time
+      expected_completion = (combinations-1.0*count)/rate
+      completed = 100.0*count/combinations
       logger.debug("Completed {0} from {1} {2:.4f}% at rate {3} completion in {4:.2f} hours. Found {5} pairs".format(
         count, combinations, completed, rate, expected_completion/3600, len(d)))
       plot_distances(distances, count)
