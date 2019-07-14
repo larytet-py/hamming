@@ -87,7 +87,7 @@ def plot_distances(distances, total, step = 5):
   s = "\n"
   while i < len(plot_list):
     count = plot_list[i]
-    s = s + ("{0:4} {1} {2:2.4f}\n".format(i*5, count, (1.0*count)/total*100))
+    s = s + ("{0:4}-{1} {2} {3:2.4f}\n".format(i*5, (i+1)*5-1, count, (1.0*count)/total*100))
     i += 1
   logger.info(s)
        
@@ -171,6 +171,7 @@ if __name__ == '__main__':
           logger.debug("Read {0} hashes. First hash {1}".format(len(data_set), hex(data_set[0])))
 
         cpus = multiprocessing.cpu_count()
+        cpus = 1
         started_jobs = []
         for cpu in range(cpus):          
           data_cpu_set_size = data_set_size/cpus
