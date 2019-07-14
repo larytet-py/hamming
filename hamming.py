@@ -108,6 +108,7 @@ def hamming(data_set, max_distance):
       completed = 100.0*count/combinations
       logger.debug("Completed {0} from {1} {2:.4f}% at rate {3} completion in {4:.2f} hours. Found {5} pairs".format(
         count, combinations, completed, rate, expected_completion/3600, len(d)))
+      logger.debug("{0}".format(distances))
       plot_distances(distances, count)
   return d
 
