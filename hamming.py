@@ -63,9 +63,10 @@ def nCr(n,r):
     return numer / denom
 
 def update_dict(distances, hashes, c1, c2, distance):
-  if not c1 in hashes.keys():
-    hashes[c1] = []
-  hashes[c1].append((c2, distance))
+  if not hashes is None:
+    if not c1 in hashes.keys():
+      hashes[c1] = []
+    hashes[c1].append((c2, distance))
 
   if not distance in distances.keys():
     distances[distance] = 1
@@ -94,7 +95,7 @@ def hamming(data_set, max_distance):
   '''
   combinations = nCr(len(data_set), 2)
   logger.info("Brute force {0} pairs for distances below {1}".format(combinations, max_distance+1))
-  d = {}
+  d = None # {}
   count = 0
   start_time = time.time()
   distances = {}
