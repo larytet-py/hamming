@@ -56,6 +56,12 @@ def bit_count(n, max):
         n >>= 1
     return count
 
+def nCr(n,r):
+    r = min(r, n-r)
+    numer = functools.reduce(operator.mul, range(n, n-r, -1), 1)
+    denom = functools.reduce(operator.mul, range(1, r+1), 1)
+    return numer / denom
+
 def update_dict(distances, hashes, c1, c2, distance):
   if not c1 in hashes.keys():
     hashes[c1] = []
@@ -66,24 +72,19 @@ def update_dict(distances, hashes, c1, c2, distance):
   else:
     distances[distance] = distances[distance] + 1
 
-def nCr(n,r):
-    r = min(r, n-r)
-    numer = functools.reduce(operator.mul, range(n, n-r, -1), 1)
-    denom = functools.reduce(operator.mul, range(1, r+1), 1)
-    return numer / denom
-
 def plot_distances(distances, total, step = 5):
   plot_list = []
-  for distance, count in distances.items():
+  for distance in distances:
     distance_normalize = distance/step
     while len(plot_list) <= distance_normalize:
       plot_list.append(0)
-    plot_list[distance_normalize] += count
+    plot_list[distance_normalize] += distances[distance]
 
   i = 0
   #logger.info("Plotting {0} {1}".format(plot_list, distances))
   while i < len(plot_list):
-    logger.info("{0} {1} {2:.4f}".format(i*5, count, count/total))
+    count = plot_list[i]
+    logger.info("{0} {1} {2:.4f}".format(i*5, count, (1.0*count)/total*100))
     i += 1
        
 
